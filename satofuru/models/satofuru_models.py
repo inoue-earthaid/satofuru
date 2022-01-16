@@ -48,9 +48,11 @@ class Satofuru(GoogleBrowser):
         sleep(3)
 
     def get_values(self):
-        path = glob.glob(r'C:\Users\ooaka\Downloads\for_date.csv')
-        with open(path[0], 'r', newline='') as file:
+        path = r'C:\Users\ooaka\Downloads\for_date.csv'
+        glob_path = glob.glob(r'C:\Users\ooaka\Downloads\for_date.csv')
+        with open(glob_path[0], 'r', newline='') as file:
             data = file.read().split('\n')
+        os.remove(path)
 
         data = ','.join(data)
         r_data = set(re.findall(r'[1-9],[0-9]', data))
