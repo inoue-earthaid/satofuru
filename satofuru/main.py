@@ -7,5 +7,5 @@ from satofuru.controller import satofuru_control
 def main():
     satofuru_control.control()
 
-# if __name__ == '__main__':
-    # main()
+if __name__ == '__main__':
+    main()

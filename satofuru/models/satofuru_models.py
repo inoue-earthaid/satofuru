@@ -49,14 +49,14 @@ class Satofuru(GoogleBrowser):
 
     def get_values(self):
         path = r'C:\Users\ooaka\Downloads\for_date.csv'
-        glob_path = glob.glob(r'C:\Users\ooaka\Downloads\for_date.csv')
+        glob_path = glob.glob(path)
         with open(glob_path[0], 'r', newline='') as file:
             data = file.read().split('\n')
         os.remove(path)
 
         data = ','.join(data)
-        r_data = set(re.findall(r'[1-9],[0-9]', data))
-        r_dict = {v:v.replace(',', '') for v in r_data}       
+        r_data = set(re.findall(r'[1-9],[0-9]{3}', data))
+        r_dict = {v:v.replace(',', '') for v in r_data}
         for k, v in r_dict.items():
             data = data.replace(k, v)
         self.data = data.replace('"','').split(',')
