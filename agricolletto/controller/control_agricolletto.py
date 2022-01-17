@@ -1,4 +1,4 @@
-from agricolletto.models.tes import Agricolletto
+from agricolletto.models.agricollet_models import Agricolletto
 
 def agricolletto():
     agri = Agricolletto()
