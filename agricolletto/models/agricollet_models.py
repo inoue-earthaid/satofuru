@@ -69,20 +69,20 @@ class Agricolletto(object):
                     new_list.append(v)
             self.wrapper.append(new_list)
 
-        wrapper_words = []
-        head_line_list = [head_line.replace('\n', '') for head_line in head_line_list]
-        for inner in self.wrapper:
-            date = f'{head_line_list[0]} : {inner[0]}'
-            item = f'{head_line_list[1]}　 : {inner[1]}'
-            qty = f'{head_line_list[2]}　　 : {inner[2]}'
-            words = [date, item, qty]
-            r = '\n'.join(words)
-            wrapper_words.append(r)
+        # wrapper_words = []
+        # head_line_list = [head_line.replace('\n', '') for head_line in head_line_list]
+        # for inner in self.wrapper:
+        #     date = f'{head_line_list[0]} : {inner[0]}'
+        #     item = f'{head_line_list[1]}　 : {inner[1]}'
+        #     qty = f'{head_line_list[2]}　　 : {inner[2]}'
+        #     words = [date, item, qty]
+        #     r = '\n'.join(words)
+        #     wrapper_words.append(r)
         
-        head_line = '■ アグリコレット売上'
-        delimiter = '\n' + '-' * 20 + '\n'
-        result = f'{head_line}{delimiter}' + f'{delimiter}'.join(wrapper_words)
-        return result
+        # head_line = '■ アグリコレット売上'
+        # delimiter = '\n' + '-' * 20 + '\n'
+        # result = f'{head_line}{delimiter}' + f'{delimiter}'.join(wrapper_words)
+        # return result
 
     def reflect_spreadsheet(self):
         config_ini = configparser.ConfigParser()
@@ -97,10 +97,3 @@ class Agricolletto(object):
         for i, range in enumerate(reflection_range):
             range.value = value_list[i]
         sheet.update_cells(reflection_range)
-        
-
-if __name__ == '__main__':
-    agri = Agricolletto()
-    agri.shaping_pdf()
-    agri.reflect_spreadsheet()
-    
