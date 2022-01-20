@@ -66,7 +66,7 @@ class Satofuru(GoogleBrowser):
         wb = open_sp.open_sp(sp_key)
         import_sheet = wb.worksheet('import')
         row_num = len(import_sheet.col_values(1))
-        range_list = import_sheet.range(f'A{row_num+1}:K{row_num+1 + int(len(self.data)/12)}')
+        range_list = import_sheet.range(f'A{row_num+1}:K{row_num+1 + int(len(self.data)/12)+1}')
 
         for i, range in enumerate(range_list):
             range.value = self.data[i]
