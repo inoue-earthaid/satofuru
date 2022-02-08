@@ -1,3 +1,7 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 import configparser
 import itertools
 from pdfminer.pdfinterp import PDFResourceManager
@@ -6,14 +10,34 @@ from pdfminer.pdfinterp import PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.layout import LAParams
 import re
+from pydrive.drive import GoogleDrive
+from files import auth
 
 from connect_spreadsheet import open_sp
 
-PDF_TXT_PATH = r'agricolletto\pdf_text.txt'
+
 class Agricolletto(object):
+    def __init__(self) -> None:
+        self.config_ini = configparser.ConfigParser()
+        self.config_ini.read('config.ini', encoding='utf-8')
+        self.dst_path = r'C:\Users\ooaka\Downloads'
+        self.download_path = ''
+        self.pdf_txt_path = ''
+
+    def download_file(self):
+        folder_id = self.config_ini['g_drive']['download_order_google_drive_id']
+        gauth = auth.get_googleauth()
+        gauth.LocalWebserverAuth()
+        drive = GoogleDrive(gauth)
+        files = drive.ListFile({'q': '"{}" in parents'.format(folder_id)}).GetList()
+        for file in files:
+            self.download_path = os.path.join(self.dst_path, file['title'])
+            file.GetContentFile(self.download_path)
+
     def convert_pdf(self):
-        with open(PDF_TXT_PATH, 'w',encoding='utf-8') as outfp:
-            with open(r"agricolletto\pdf_file\委託業者日次実績表1075.PDF", 'rb') as fp:
+        self.pdf_txt_path = os.path.join(self.dst_path, 'pdf_text.txt') 
+        with open(self.pdf_txt_path, 'w',encoding='utf-8') as outfp:
+            with open(self.download_path, 'rb') as fp:
                 # 各種テキスト抽出に必要なPdfminer.sixのオブジェクトを取得する処理
                 rmgr = PDFResourceManager() # PDFResourceManagerオブジェクトの取得
                 lprms = LAParams(
@@ -24,6 +48,7 @@ class Agricolletto(object):
 
                     for page in PDFPage.get_pages(fp):
                         iprtr.process_page(page)
+        os.remove(self.download_path)
 
     def shaping_pdf(self):
         delete_char = [
@@ -44,7 +69,7 @@ class Agricolletto(object):
             '金額\n'
         ]
 
-        with open(PDF_TXT_PATH, 'r', encoding='utf-8') as f:
+        with open(self.pdf_txt_path, 'r', encoding='utf-8') as f:
             pdf_text = f.readlines()
         pdf_text = [re.sub(r'[\n　]', '', chr) for chr in pdf_text if chr not in delete_char + head_line_list] 
         
@@ -68,6 +93,7 @@ class Agricolletto(object):
                 if i % count == _:
                     new_list.append(v)
             self.wrapper.append(new_list)
+        os.remove(self.pdf_txt_path)
 
         # wrapper_words = []
         # head_line_list = [head_line.replace('\n', '') for head_line in head_line_list]
@@ -85,9 +111,7 @@ class Agricolletto(object):
         # return result
 
     def reflect_spreadsheet(self):
-        config_ini = configparser.ConfigParser()
-        config_ini.read('config.ini', encoding='utf-8')
-        sheet_key = config_ini['sp_key']['agricolletto_sheet_key']
+        sheet_key = self.config_ini['sp_key']['agricolletto_sheet_key']
         wb = open_sp.open_sp(sheet_key)
         sheet = wb.worksheet('売上')
         data_count = len(self.wrapper)
