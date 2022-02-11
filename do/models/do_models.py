@@ -17,7 +17,8 @@ CONFIG_INI.read('config.ini', encoding='utf-8')
 class Do(GoogleBrowser):
     def __init__(self, headless=False):
         super().__init__(headless)
-        self.sp = ''
+        sheet_key = CONFIG_INI['sp_key']['do_sheet_key']
+        self.sp = open_sp.open_sp(sp_key=sheet_key)
         self.dl_path = r'C:\Users\ooaka\Downloads'
 
     def login(self):
@@ -116,7 +117,7 @@ class Do(GoogleBrowser):
         try:
             self.browser.find_element_by_xpath('//tr[@class="odd"]/td[contains(text(), "検索条件にマッチするデータがありません。")]')
             print('Not-order')
-            return
+            return True
         except:
             pass
         self.browser.find_element_by_xpath('//input[contains(@type, "checkbox") and contains(@class, "checkAll") and contains(@class, "widthCheckbox")]').click()
@@ -132,8 +133,6 @@ class Do(GoogleBrowser):
     def import_csv(self):
         config_ini = configparser.ConfigParser()
         config_ini.read('config.ini')
-        sheet_key = config_ini['sp_key']['do_sheet_key']
-        self.sp = open_sp.open_sp(sp_key=sheet_key)
         import_sheet = self.sp.worksheet('import')
         last_row = len(import_sheet.col_values(1))
         path_choice = glob.glob(os.path.join(self.dl_path, r'yamato2022[0-9]*.csv'))
