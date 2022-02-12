@@ -138,8 +138,9 @@ class Do(GoogleBrowser):
         path_choice = glob.glob(os.path.join(self.dl_path, r'yamato2022[0-9]*.csv'))
 
         for i, path_candidate in enumerate(path_choice):
+            """ check files.length >= 1 """
             if i:
-                return 'files.length >= 1'
+                return 
             is_regex_match = bool(re.match(r'^yamato2022[0-9]{10}.csv', os.path.basename(path_candidate)))
         if is_regex_match:
             path = path_candidate
@@ -157,6 +158,11 @@ class Do(GoogleBrowser):
     def export_yamato_csv(self):
         yamato_export_sheet = self.sp.worksheet('export')
         done_list = yamato_export_sheet.col_values(1)
+        
+        """ check export_data >= 1 """
+        if len(done_list) == 1:
+            return True 
+
         done_list.pop(0)
         export_values = yamato_export_sheet.get_all_values()
         now = datetime.datetime.now()

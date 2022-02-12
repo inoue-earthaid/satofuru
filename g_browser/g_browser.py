@@ -13,7 +13,7 @@ class GoogleBrowser(object):
         self.options.add_argument('--window-size=1920,1080') 
         self.chromedriver = file_path
         self.browser = webdriver.Chrome(self.chromedriver, options=self.options)
-        self.browser.implicitly_wait(2)
+        self.browser.implicitly_wait(1)
 
     def quit(self):
         self.browser.quit()

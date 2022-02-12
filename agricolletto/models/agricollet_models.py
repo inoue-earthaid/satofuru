@@ -55,7 +55,6 @@ class Agricolletto(object):
 
                     for page in PDFPage.get_pages(fp):
                         iprtr.process_page(page)
-        # os.remove(self.download_path)
 
     def shaping_pdf(self):
         delete_char = [
@@ -68,6 +67,7 @@ class Agricolletto(object):
             '仕入先計\n',
             '\n',
             '\x0c',
+            '',
         ]
         head_line_list = [
             '売上日付\n',
@@ -89,8 +89,7 @@ class Agricolletto(object):
                 pdf_text.pop(count*2+1)
                 pdf_text.pop(count*2)
                 break
-
-        for _ in range(count):
+        for _ in range(count+2):
             pdf_text.pop(-1)
         self.wrapper = []
         for _ in range(count):

@@ -16,10 +16,14 @@ def exe_process():
     sleep(1)
     do.quit()
     if is_none:
-        yamato_import_csv = do.export_yamato_csv()
+        is_yamato_export_none = do.export_yamato_csv()
+        if is_yamato_export_none:
+            return
         return 
     do.import_csv()
-    yamato_import_csv = do.export_yamato_csv()
+    is_yamato_export_none = do.export_yamato_csv()
+    if is_yamato_export_none:
+        return
     sleep(2)
 
     
