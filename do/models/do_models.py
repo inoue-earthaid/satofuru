@@ -96,7 +96,7 @@ class Do(GoogleBrowser):
         self.browser.find_element_by_xpath('//th[contains(text(), "集荷先")]/following-sibling::td/div/ul/li/input').click()
         self.browser.find_element_by_xpath('//th[contains(text(), "集荷先")]/following-sibling::td/div/div/ul/li[contains(text(), "アースエイド")]').click()
         today = datetime.date.today()
-        delta = 30
+        delta = 60
         designated_day = today + datetime.timedelta(delta)
         month = designated_day.strftime('%m月')
         if month[0:1] == '0':

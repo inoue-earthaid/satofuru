@@ -13,13 +13,14 @@ def exe_process():
     do.filtering_export_csv()
     sleep(1)
     is_none = do.export_csv()
-    sleep(1)
-    do.quit()
     if is_none:
+        do.quit()
         is_yamato_export_none = do.export_yamato_csv()
         if is_yamato_export_none:
             return
         return 
+    sleep(30)
+    do.quit()
     do.import_csv()
     is_yamato_export_none = do.export_yamato_csv()
     if is_yamato_export_none:
