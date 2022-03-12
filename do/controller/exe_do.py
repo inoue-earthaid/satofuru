@@ -21,7 +21,10 @@ def exe_process():
         return 
     sleep(30)
     do.quit()
-    do.import_csv()
+    is_import_error = do.import_csv()
+    if is_import_error:
+        return 
+        
     is_yamato_export_none = do.export_yamato_csv()
     if is_yamato_export_none:
         return

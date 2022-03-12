@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from agricolletto.controller import control_agricolletto
 
 def main():
@@ -6,4 +8,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-    os.remove(r'C:\Users\ooaka\Downloads\委託業者日次実績表1075.PDF')
+    file_path = r'C:\Users\ooaka\Downloads\委託業者日次実績表1075.PDF'
+    os.remove(file_path)

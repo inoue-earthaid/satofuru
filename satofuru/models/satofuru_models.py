@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 
 class Satofuru(GoogleBrowser):
-    def __init__(self, headless=False):
+    def __init__(self, headless=True):
         super().__init__(headless)
         self.config_ini = configparser.ConfigParser()
         self.config_ini.read('config.ini', encoding='utf-8')

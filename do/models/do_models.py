@@ -1,10 +1,11 @@
 import configparser
 import csv
 import datetime
-import glob
 import itertools
 import os
+from pathlib import Path
 import re
+
 from selenium.webdriver.support.select import Select
 from time import sleep
 
@@ -19,7 +20,7 @@ class Do(GoogleBrowser):
         super().__init__(headless)
         sheet_key = CONFIG_INI['sp_key']['do_sheet_key']
         self.sp = open_sp.open_sp(sp_key=sheet_key)
-        self.dl_path = r'C:\Users\ooaka\Downloads'
+        self.base_path = r'C:\Users\ooaka\Downloads'
 
     def login(self):
         url = 'https://do3biz.do-furusato.com/deliveries'
@@ -98,16 +99,17 @@ class Do(GoogleBrowser):
         today = datetime.date.today()
         delta = 60
         designated_day = today + datetime.timedelta(delta)
-        month = designated_day.strftime('%m月')
-        if month[0:1] == '0':
-            month = month.replace('0', '')
+        month = designated_day.strftime('%m月').lstrip('0')
         self.browser.find_element_by_name('delivery_info[delivery_date_to]').click()
         dropdown = self.browser.find_element_by_class_name('ui-datepicker-month')
         select = Select(dropdown)
         select.select_by_visible_text(month)
-        date = designated_day.strftime('%d')
-        if int(date) >= 26:
-            self.browser.find_elements_by_link_text(date)[1].click()
+        date = designated_day.strftime('%d').lstrip('0')
+        if int(date) >= 25:
+            try:
+                self.browser.find_elements_by_link_text(date)[1].click()
+            except:
+                self.browser.find_elements_by_link_text(date)[0].click()
         else:
             self.browser.find_element_by_link_text(date).click()
         
@@ -126,34 +128,38 @@ class Do(GoogleBrowser):
         sleep(1)
         self.browser.switch_to.frame(0)
         self.browser.find_element_by_id('is_export_type_delivery_instruction').click()
+        sleep(2)
         self.browser.find_element_by_css_selector("#export_type_delivery_instruction_chosen span").click()
+        sleep(2)
         self.browser.find_element_by_xpath('//li[contains(text(), "ヤマトB2")]').click()
+        sleep(2)
         self.browser.find_element_by_id('exportBtn').click()
 
     def import_csv(self):
-        config_ini = configparser.ConfigParser()
-        config_ini.read('config.ini')
+        pattern = '^yamato2022[\d]*\.csv$'
+        target_dir = Path(self.base_path)
+        files = [path for path in target_dir.iterdir() if re.match(pattern, path.name)]
+
+        if len(files) != 1:
+            try:
+                raise Exception('file.length is not 1file')
+            except Exception as e:
+                print(e)
+                return True
+        
+        with open(files[0], 'r') as csv_file:
+            csv_data = list(csv.reader(csv_file))
+
+        row_count = len(csv_data)
+        import_list = list(itertools.chain.from_iterable(csv_data))
         import_sheet = self.sp.worksheet('import')
         last_row = len(import_sheet.col_values(1))
-        path_choice = glob.glob(os.path.join(self.dl_path, r'yamato2022[0-9]*.csv'))
-
-        for i, path_candidate in enumerate(path_choice):
-            """ check files.length >= 1 """
-            if i:
-                return 
-            is_regex_match = bool(re.match(r'^yamato2022[0-9]{10}.csv', os.path.basename(path_candidate)))
-        if is_regex_match:
-            path = path_candidate
-        
-        with open(path, 'r') as csv_file:
-            import_list = list(itertools.chain.from_iterable(list(csv.reader(csv_file))))
-            row_count = round((len(import_list)) / 50)
         import_range = import_sheet.range(f'A{last_row + 1}:AY{last_row + row_count}')
         
-        for i, cell in enumerate(import_range):
-            cell.value = import_list[i]
+        for data, cell in zip(import_list, import_range):
+            cell.value = data
         import_sheet.update_cells(import_range)
-        os.remove(path)
+        # os.remove(files[0])
 
     def export_yamato_csv(self):
         yamato_export_sheet = self.sp.worksheet('export')
@@ -167,7 +173,7 @@ class Do(GoogleBrowser):
         export_values = yamato_export_sheet.get_all_values()
         now = datetime.datetime.now()
         date = now.strftime('%Y%m%d%H%M')
-        export_path = os.path.join(self.dl_path, f'do_yamato_export_{date}.csv')
+        export_path = os.path.join(self.base_path, f'do_yamato_export_{date}.csv')
         with open(export_path, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerows(export_values)
@@ -176,10 +182,11 @@ class Do(GoogleBrowser):
 
     def _move_done_sheet(self, done_list):
         done_sheet = self.sp.worksheet('done')
-        last_row = len(done_sheet.col_values(1)) + 1
-        range_list = done_sheet.range(f'A{last_row}:A{last_row + len(done_list) -1}')
-        for i, cell in enumerate(range_list):
-            cell.value = done_list[i]
+        last_row = len(done_sheet.col_values(1))
+        range_list = done_sheet.range(f'A{last_row + 1}:A{last_row + len(done_list)}')
+
+        for done_data, cell in zip(done_list, range_list):
+            cell.value = done_data
         done_sheet.update_cells(range_list)
 
 
@@ -210,3 +217,8 @@ class ImportYamato(GoogleBrowser):
         doropdown = self.browser.find_element_by_id('torikomi_pattern')
         select = Select(doropdown)
         select.select_by_value('1')
+
+if __name__ == '__main__':
+    do = Do()
+    do.quit()
+    do.import_csv()
