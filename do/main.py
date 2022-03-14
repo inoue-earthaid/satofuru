@@ -3,8 +3,11 @@ import csv
 import datetime
 import itertools
 import os
+import sys
 from pathlib import Path
 import re
+
+sys.path.append(os.path.dirname())
 
 from selenium.webdriver.support.select import Select
 from time import sleep
@@ -21,7 +24,6 @@ class Do(GoogleBrowser):
         super().__init__(headless)
         sheet_key = CONFIG_INI['sp_key']['do_sheet_key']
         self.sp = open_sp.open_sp(sp_key=sheet_key)
-        BASE_PATH = r'C:\Users\ooaka\Downloads'
 
     def login(self):
         url = 'https://do3biz.do-furusato.com/deliveries'
@@ -160,7 +162,7 @@ class Do(GoogleBrowser):
         for data, cell in zip(import_list, import_range):
             cell.value = data
         import_sheet.update_cells(import_range)
-        # os.remove(files[0])
+        os.remove(files[0])
 
     def export_yamato_csv(self):
         yamato_export_sheet = self.sp.worksheet('export')
@@ -271,8 +273,8 @@ def exe_process():
 
     
 if __name__ == '__main__':
-    # exe_process()
-    # sleep(20)
+    exe_process()
+    sleep(20)
     imt = ImportYamato()
     imt.login()
     imt.move_upload_page()
