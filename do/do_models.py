@@ -234,10 +234,36 @@ class ImportYamato(GoogleBrowser):
         self.browser.find_element_by_id('confirm_issue_btn2').click()
 
 
+
+def exe_process():
+    do = Do()
+    do.login()
+    sleep(1)
+    do.search_status_request()
+    sleep(1)
+    do.change_request_to_receipt()
+    sleep(1)
+    do.filtering_export_csv()
+    sleep(1)
+    is_none = do.export_csv()
+    if is_none:
+        do.quit()
+    else:
+        sleep(30)
+        do.quit()
+
+    is_import_error = do.import_csv()
+    if is_import_error:
+        pass
+        
+    is_yamato_export_none = do.export_yamato_csv()
+    if is_yamato_export_none:
+        return
+
+    
 if __name__ == '__main__':
-    # do = Do()
-    # do.quit()
-    # do.import_csv()
+    exe_process()
+    sleep(20)
     imt = ImportYamato()
     imt.login()
     imt.move_upload_page()

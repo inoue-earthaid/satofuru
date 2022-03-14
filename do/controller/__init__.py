@@ -1,5 +1,5 @@
 from time import sleep
-from do.models.do_models import Do
+from do.do_models import Do
 
 
 def execution():
