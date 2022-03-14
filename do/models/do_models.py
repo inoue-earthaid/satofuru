@@ -136,7 +136,7 @@ class Do(GoogleBrowser):
         self.browser.find_element_by_id('exportBtn').click()
 
     def import_csv(self):
-        pattern = '^yamato2022[\d]*\.csv$'
+        pattern = '^yamato2022\d*\.csv$'
         target_dir = Path(self.base_path)
         files = [path for path in target_dir.iterdir() if re.match(pattern, path.name)]
 
@@ -205,20 +205,39 @@ class ImportYamato(GoogleBrowser):
         self.browser.find_element_by_id('password').send_keys(password)
         self.browser.find_element_by_class_name('nav-login-btn').click()
         sleep(1)
+        self.browser.find_element_by_link_text('もっと見る').click()
         self.browser.find_element_by_link_text('送り状発行システムB2クラウド').click()
         sleep(1.5)
 
     def move_upload_page(self):
         issued_date_url = 'https://newb2web.kuronekoyamato.co.jp/ex_data_import.html'
         self.browser.get(issued_date_url)
-        sleep(.5)
+        sleep(1)
 
         from selenium.webdriver.support.select import Select
         doropdown = self.browser.find_element_by_id('torikomi_pattern')
         select = Select(doropdown)
         select.select_by_value('1')
+        target_file = os.path.abspath(r"C:\Users\ooaka\Downloads\yamato20220117095822.csv")
+        self.browser.find_element_by_id('filename').send_keys(target_file)
+        sleep(1)
+        self.browser.find_element_by_id('import_start').click()
+        sleep(3)
+        error_count = self.browser.find_element_by_id('num_of_error').text.replace('件', '')
+        if int(error_count):
+            try:
+                raise Exception(f'エラーが{error_count}件あります')
+            except Exception as e:
+                print(e)
+                sleep(3000)
+                return
+        self.browser.find_element_by_id('confirm_issue_btn2').click()
+
 
 if __name__ == '__main__':
-    do = Do()
-    do.quit()
-    do.import_csv()
+    # do = Do()
+    # do.quit()
+    # do.import_csv()
+    imt = ImportYamato()
+    imt.login()
+    imt.move_upload_page()
