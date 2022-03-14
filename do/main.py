@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 import re
 
-sys.path.append(os.path.dirname())
+sys.path.append(os.path.dirname(__file__))
 
 from selenium.webdriver.support.select import Select
 from time import sleep
