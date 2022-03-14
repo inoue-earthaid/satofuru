@@ -14,13 +14,14 @@ from connect_spreadsheet import open_sp
 
 CONFIG_INI = configparser.ConfigParser()
 CONFIG_INI.read('config.ini', encoding='utf-8')
+BASE_PATH = r'C:\Users\ooaka\Downloads'
 
 class Do(GoogleBrowser):
     def __init__(self, headless=False):
         super().__init__(headless)
         sheet_key = CONFIG_INI['sp_key']['do_sheet_key']
         self.sp = open_sp.open_sp(sp_key=sheet_key)
-        self.base_path = r'C:\Users\ooaka\Downloads'
+        BASE_PATH = r'C:\Users\ooaka\Downloads'
 
     def login(self):
         url = 'https://do3biz.do-furusato.com/deliveries'
@@ -137,7 +138,7 @@ class Do(GoogleBrowser):
 
     def import_csv(self):
         pattern = '^yamato2022\d*\.csv$'
-        target_dir = Path(self.base_path)
+        target_dir = Path(BASE_PATH)
         files = [path for path in target_dir.iterdir() if re.match(pattern, path.name)]
 
         if len(files) != 1:
@@ -173,7 +174,7 @@ class Do(GoogleBrowser):
         export_values = yamato_export_sheet.get_all_values()
         now = datetime.datetime.now()
         date = now.strftime('%Y%m%d%H%M')
-        export_path = os.path.join(self.base_path, f'do_yamato_export_{date}.csv')
+        export_path = os.path.join(BASE_PATH, f'do_yamato_export_{date}.csv')
         with open(export_path, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerows(export_values)
@@ -218,8 +219,17 @@ class ImportYamato(GoogleBrowser):
         doropdown = self.browser.find_element_by_id('torikomi_pattern')
         select = Select(doropdown)
         select.select_by_value('1')
-        target_file = os.path.abspath(r"C:\Users\ooaka\Downloads\yamato20220117095822.csv")
-        self.browser.find_element_by_id('filename').send_keys(target_file)
+        dir = Path(BASE_PATH)
+        pattern = '^do_yamato_export_2022\d+\.csv$'
+        files = [file for file in dir.iterdir() if re.match(pattern, file.name)]
+        if len(files) != 1:
+            try:
+                raise Exception('file.length is not 1file')
+            except Exception as e:
+                print(e)
+                return True
+        file = os.path.abspath(files[0])
+        self.browser.find_element_by_id('filename').send_keys(file)
         sleep(1)
         self.browser.find_element_by_id('import_start').click()
         sleep(3)
@@ -232,7 +242,6 @@ class ImportYamato(GoogleBrowser):
                 sleep(3000)
                 return
         self.browser.find_element_by_id('confirm_issue_btn2').click()
-
 
 
 def exe_process():
@@ -262,8 +271,8 @@ def exe_process():
 
     
 if __name__ == '__main__':
-    exe_process()
-    sleep(20)
+    # exe_process()
+    # sleep(20)
     imt = ImportYamato()
     imt.login()
     imt.move_upload_page()
