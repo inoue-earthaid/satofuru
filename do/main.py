@@ -17,7 +17,7 @@ from connect_spreadsheet import open_sp
 
 CONFIG_INI = configparser.ConfigParser()
 CONFIG_INI.read('config.ini', encoding='utf-8')
-BASE_PATH = r'C:\Users\ooaka\Downloads'
+BASE_PATH = r'C:\Users\ooaka\Downloads\tekitou'
 
 class Do(GoogleBrowser):
     def __init__(self, headless=False):
