@@ -262,14 +262,15 @@ def exe_process():
     is_none = do.export_csv()
     if is_none:
         do.quit()
-    else:
+    else: # fileダウンロードがあった場合
         sleep(30)
         do.quit()
+        is_import_error = do.import_csv()
+        if is_import_error:
+            return
+        else:
+            sleep(20)
 
-    is_import_error = do.import_csv()
-    if is_import_error:
-        pass
-        
     is_yamato_export_none = do.export_yamato_csv()
     if is_yamato_export_none:
         return
@@ -277,7 +278,6 @@ def exe_process():
     
 if __name__ == '__main__':
     exe_process()
-    sleep(20)
     imt = ImportYamato()
     imt.login()
     imt.move_upload_page()
