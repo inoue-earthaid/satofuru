@@ -3,11 +3,12 @@ import csv
 import datetime
 import itertools
 import os
+import shutil
 import sys
 from pathlib import Path
 import re
 
-sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from selenium.webdriver.support.select import Select
 from time import sleep
@@ -17,7 +18,7 @@ from connect_spreadsheet import open_sp
 
 CONFIG_INI = configparser.ConfigParser()
 CONFIG_INI.read('config.ini', encoding='utf-8')
-BASE_PATH = r'C:\Users\ooaka\Downloads\tekitou'
+BASE_PATH = r'C:\Users\ooaka\Downloads'
 
 class Do(GoogleBrowser):
     def __init__(self, headless=False):
@@ -241,9 +242,11 @@ class ImportYamato(GoogleBrowser):
                 raise Exception(f'エラーが{error_count}件あります')
             except Exception as e:
                 print(e)
-                sleep(3000)
                 return
         self.browser.find_element_by_id('confirm_issue_btn2').click()
+        dest = r'D:\共有\00.重要データGD(10GB)\重要データ(10GB)\11.取引先\0.ふるさと納税&高知かわうそ市場\7.ふるさと納税新システムdo(2019.11月～)\ヤマト送付状データdoダウンロード'
+        shutil.move(file, dest)
+        sleep(3000)
 
 
 def exe_process():
